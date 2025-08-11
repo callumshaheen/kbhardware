@@ -13,7 +13,7 @@ require('dotenv').config();
 const http = require('http');
 const mongoose = require('mongoose');
 const { Server } = require('socket.io');
-const initRealtime = require('./realtime');
+const attachRealtime = require('./realtime');
 const { createApp } = require('./app');
 
 const PORT = process.env.PORT || 4000;
@@ -50,7 +50,7 @@ async function start() {
   // Initialize realtime watchers after connection is ready
   mongoose.connection.once('open', () => {
     try {
-      initRealtime(io, mongoose.connection);
+      attachRealtime(io, mongoose.connection);
       console.log('Realtime initialized');
     } catch (e) {
       console.log('Realtime init failed:', e.message);

@@ -1,29 +1,28 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+jest.setTimeout(30000);
 const request = require('supertest');
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const { createApp } = require('../src/app');
+const mongoose = require('mongoose');
 const Otp = require('../src/models/otp.model');
-
-let mongod;
-let app;
+const app = createApp();
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create();
-  const uri = mongod.getUri();
-  await mongoose.connect(uri);
-  app = createApp();
+  await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 });
 
 afterAll(async () => {
   await mongoose.disconnect();
-  if (mongod) await mongod.stop();
 });
 
-test('POST /auth/request-otp returns 200', async () => {
-  const res = await request(app).post('/auth/request-otp').send({ phone: '+911234567890' });
-  expect(res.statusCode).toBe(200);
-  const doc = await Otp.findOne({ phone: '+911234567890' });
-  expect(doc).toBeTruthy();
+describe('POST /auth/request-otp', () => {
+  it('should return 200 for valid request', async () => {
+    const res = await request(app)
+      .post('/auth/request-otp')
+      .send({ phone: '1234567890' });
+    expect(res.statusCode).toBe(200);
+    const doc = await Otp.findOne({ phone: '1234567890' });
+    expect(doc).toBeTruthy();
+  });
 });
 
 

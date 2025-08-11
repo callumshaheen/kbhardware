@@ -39,7 +39,7 @@ paintshop/
    ```
 4. Run the development server:
    ```bash
-   npm run dev
+   npm start
    ```
 
 ### Painter App & Admin App
@@ -54,6 +54,61 @@ paintshop/
    ```bash
    npx expo start
    ```
+
+### Docker Deployment (Local or Render)
+
+1. Build the Docker image:
+   ```bash
+   docker build -t kbhardware-backend .
+   ```
+2. Run the container:
+   ```bash
+   docker run -p 4000:4000 --env-file .env kbhardware-backend
+   ```
+
+### Deploying to Render.com
+
+1. In Render, create a new **Web Service** and connect your repository.
+2. Set the following environment variables in Render:
+   - `MONGO_URI`
+   - `JWT_SECRET`
+   - `TWILIO_SID`
+   - `TWILIO_AUTH_TOKEN`
+   - `TWILIO_SERVICE_SID`
+   - `PORT` (default: 4000)
+   - `FRONTEND_URL` (if needed)
+3. Render will auto-detect the Dockerfile and build the service.
+4. On deploy, your backend will be available at the Render-provided URL.
+
+#### Example `render.yaml` (optional)
+
+You may add a `render.yaml` in the backend folder for infrastructure-as-code:
+
+```yaml
+services:
+  - type: web
+    name: kbhardware-backend
+    env: docker
+    plan: starter
+    region: oregon
+    branch: main
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: MONGO_URI
+        value: <your-mongo-uri>
+      - key: JWT_SECRET
+        value: <your-jwt-secret>
+      - key: TWILIO_SID
+        value: <your-twilio-sid>
+      - key: TWILIO_AUTH_TOKEN
+        value: <your-twilio-auth-token>
+      - key: TWILIO_SERVICE_SID
+        value: <your-twilio-service-sid>
+      - key: PORT
+        value: 4000
+      - key: FRONTEND_URL
+        value: http://localhost:19006
+```
 
 ## Key Endpoints
 
