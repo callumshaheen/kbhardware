@@ -1,0 +1,1 @@
+# Paintshop\n\nMonorepo containing backend (Node/Express + MongoDB + Socket.IO) and two Expo apps (Painter & Admin).\n\n- Use Expo for React Native apps.\n- Use MongoDB Atlas for production.\n- Use Render for backend deploy.\n\n## Workspaces\n- backend\n- painter-app\n- admin-app\n\n## Running\nSee backend/README.md or root README updates later.\n

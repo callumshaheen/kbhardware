@@ -1,0 +1,25 @@
+# Node / React Native
+node_modules
+.expo
+.expo-shared
+.expo/*
+*.env
+.env
+.DS_Store
+coverage
+dist
+.build
+.tmp
+\.idea
+\.vscode
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Expo caches
+**/.expo/**
+
+# OS
+Thumbs.db
