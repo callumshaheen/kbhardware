@@ -15,6 +15,10 @@ const http = require('http');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { Server } = require('socket.io');
+const attachRealtime = require('./realtime');
+const authRoutes = require('./routes/auth.routes');
+const adminRoutes = require('./routes/admin.routes');
+const painterRoutes = require('./routes/painter.routes');
 
 const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:19006';
@@ -34,6 +38,11 @@ async function start() {
 
   app.get('/health', (req, res) => res.json({ ok: true }));
 
+  // Routes
+  app.use('/auth', authRoutes);
+  app.use('/admin', adminRoutes);
+  app.use('/painters', painterRoutes);
+
   mongoose.connection.on('error', (err) => {
     console.error('MongoDB connection error:', err);
   });
@@ -48,6 +57,16 @@ async function start() {
     .connect(MONGO_URI, { autoIndex: true, serverSelectionTimeoutMS: 2000 })
     .then(() => console.log('MongoDB connected'))
     .catch((err) => console.error('Failed to connect to MongoDB:', err.message));
+
+  // Initialize realtime watchers after connection is ready
+  mongoose.connection.once('open', () => {
+    try {
+      attachRealtime(io, mongoose.connection);
+      console.log('Realtime initialized');
+    } catch (e) {
+      console.log('Realtime init failed:', e.message);
+    }
+  });
 
   process.on('SIGINT', async () => {
     console.log('Shutting down...');
