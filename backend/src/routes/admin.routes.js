@@ -8,6 +8,7 @@ const Admin = require('../models/admin.model');
 const Offer = require('../models/offer.model');
 const Transaction = require('../models/transaction.model');
 const { addCommission } = require('../services/commission.service');
+const DeviceToken = require('../models/deviceToken.model');
 
 const router = express.Router();
 
@@ -54,7 +55,20 @@ router.patch('/painters/:id/approve', requireAuth, requireRole('admin'), async (
       { new: true }
     );
     if (!painter) return res.status(404).json({ error: 'Not found' });
-    // TODO: send notification via push/SMS later
+    // Push notification (best-effort)
+    try {
+      const tokens = await DeviceToken.find({ painter: painter._id });
+      if (tokens.length) {
+        const messages = tokens.map((t) => ({ to: t.token, sound: 'default', title: 'Approved', body: 'Your account has been approved.' }));
+        await fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(messages),
+        });
+      }
+    } catch (e) {
+      console.log('Push send failed:', e.message);
+    }
     res.json(painter);
   } catch (err) {
     next(err);
