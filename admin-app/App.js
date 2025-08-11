@@ -12,7 +12,6 @@ const Tabs = createBottomTabNavigator();
 
 
 export default function App() {
-  const { token } = useAuth();
   const { token, login, logout } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
 

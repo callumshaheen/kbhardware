@@ -1,0 +1,88 @@
+openapi: 3.0.0
+info:
+  title: KBHardware Backend API
+  version: 1.0.0
+  description: Critical endpoints for auth, admin, commission, leaderboard
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/auth/request-otp:
+    post:
+      summary: Request OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+      responses:
+        '200':
+          description: OTP sent
+  /api/auth/verify-otp:
+    post:
+      summary: Verify OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: OTP verified
+  /api/admin/approve:
+    post:
+      summary: Admin approves painter
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                painterId:
+                  type: string
+      responses:
+        '200':
+          description: Painter approved
+  /api/commission:
+    post:
+      summary: Add commission
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Commission added
+  /api/leaderboard:
+    get:
+      summary: Get leaderboard
+      responses:
+        '200':
+          description: Leaderboard data
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
