@@ -1,33 +1,75 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
-import useAuth from '../store/useAuth';
-import { api } from '../lib/api';
+import { View, Text, StyleSheet } from 'react-native';
+import { useUser } from '../store/useUser';
+import { useApi } from '../lib/useApi';
+import Button from '../components/Button';
+import Input from '../components/Input';
 
 export default function LoginScreen() {
-  const { setToken } = useAuth();
+  const { setToken } = useUser();
+  const { request, loading, error } = useApi();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [inputError, setInputError] = useState({});
+  const [toast, setToast] = useState('');
+
+  const validate = () => {
+    const err = {};
+    if (!email) err.email = 'Email required';
+    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) err.email = 'Invalid email';
+    if (!password) err.password = 'Password required';
+    setInputError(err);
+    return Object.keys(err).length === 0;
+  };
+
   const login = async () => {
-    setLoading(true);
+    if (!validate()) return;
     try {
-      const res = await api('/admin/login', { method: 'POST', body: { email, password } });
+      const res = await request('/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
       setToken(res.token);
     } catch (e) {
-      alert('Login failed');
-    } finally {
-      setLoading(false);
+      setToast(error || 'Login failed');
+      setTimeout(() => setToast(''), 2000);
     }
   };
+
   return (
-    <View style={{ padding: 16 }}>
-      <Text>Email</Text>
-      <TextInput value={email} onChangeText={setEmail} autoCapitalize="none" style={{ borderWidth: 1, padding: 8 }} />
-      <Text>Password</Text>
-      <TextInput value={password} onChangeText={setPassword} secureTextEntry style={{ borderWidth: 1, padding: 8 }} />
-      <Button title={loading ? '...' : 'Login'} onPress={login} />
+    <View style={styles.container}>
+      <Input
+        label="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        error={inputError.email}
+        keyboardType="email-address"
+      />
+      <Input
+        label="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        error={inputError.password}
+      />
+      <Button title="Login" onPress={login} loading={loading} disabled={loading} />
+      {toast ? <Text style={styles.toast}>{toast}</Text> : null}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', padding: 16 },
+  toast: {
+    backgroundColor: '#f44336',
+    color: '#fff',
+    padding: 8,
+    borderRadius: 6,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+});
 
 

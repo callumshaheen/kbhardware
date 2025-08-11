@@ -65,9 +65,21 @@ router.patch('/painters/:id/approve', requireAuth, requireRole('admin'), async (
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(messages),
         });
+      } else {
+        // Fallback to SMS via Twilio
+        try {
+          const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+          await twilio.messages.create({
+            to: painter.phone,
+            from: process.env.TWILIO_FROM,
+            body: 'Your account has been approved.'
+          });
+        } catch (smsErr) {
+          console.log('SMS send failed:', smsErr.message);
+        }
       }
     } catch (e) {
-      console.log('Push send failed:', e.message);
+      console.log('Push/SMS send failed:', e.message);
     }
     res.json(painter);
   } catch (err) {
