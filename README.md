@@ -32,8 +32,12 @@ paintshop/
    npm install
    ```
 
-2. Create a `.env` file with required environment variables
-3. Run the development server:
+2. Create a `.env` file with required environment variables (see `.env.example`). Set at least `MONGO_URI`, `JWT_SECRET`, `PORT`, `FRONTEND_URL`.
+3. Verify health endpoint (requires Node installed):
+   ```bash
+   curl http://localhost:4000/health
+   ```
+4. Run the development server:
    ```bash
    npm run dev
    ```
@@ -51,9 +55,30 @@ paintshop/
    npx expo start
    ```
 
+## Key Endpoints
+
+- POST `/auth/request-otp` { phone }
+- POST `/auth/verify-otp` { phone, otp }
+- POST `/admin/login` { email, password }
+- GET `/admin/painters?status=pending|approved`
+- PATCH `/admin/painters/:id/approve`
+- PATCH `/admin/painters/:id/reject`
+- PATCH `/admin/painters/:id/remove`
+- POST `/admin/offers`
+- DELETE `/admin/offers/:id`
+- POST `/admin/commissions` { painterId, amount, offerId? }
+- GET `/painters/leaderboard?limit=20`
+- GET `/painters/me`
+- GET `/painters/offers`
+- GET `/painters/transactions`
+
 ## Development Notes
 
 - Use Expo for building and deploying React Native applications
 - MongoDB Atlas is used for production database
 - Backend is deployed on Render
 - Each workspace has its own package.json and dependencies
+
+## Deployment
+
+Deploy backend on Render with env vars: `MONGO_URI`, `JWT_SECRET`, `TWILIO_*`, `PORT`, `FRONTEND_URL`.
