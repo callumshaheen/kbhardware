@@ -10,25 +10,18 @@ Copilot: Create an Express server file that:
 */
 
 require('dotenv').config();
-const express = require('express');
 const http = require('http');
-const cors = require('cors');
 const mongoose = require('mongoose');
 const { Server } = require('socket.io');
 const attachRealtime = require('./realtime');
-const authRoutes = require('./routes/auth.routes');
-const adminRoutes = require('./routes/admin.routes');
-const painterRoutes = require('./routes/painter.routes');
-const deviceRoutes = require('./routes/device.routes');
+const { createApp } = require('./app');
 
 const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:19006';
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/paintshop';
 
 async function start() {
-  const app = express();
-  app.use(express.json());
-  app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+  const app = createApp();
 
   const server = http.createServer(app);
   const io = new Server(server, {
@@ -37,13 +30,7 @@ async function start() {
 
   app.locals.io = io;
 
-  app.get('/health', (req, res) => res.json({ ok: true }));
-
-  // Routes
-  app.use('/auth', authRoutes);
-  app.use('/admin', adminRoutes);
-  app.use('/painters', painterRoutes);
-  app.use('/device', deviceRoutes);
+  // Routes are in app.js
 
   mongoose.connection.on('error', (err) => {
     console.error('MongoDB connection error:', err);
