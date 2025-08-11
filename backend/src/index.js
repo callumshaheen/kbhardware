@@ -19,6 +19,7 @@ const attachRealtime = require('./realtime');
 const authRoutes = require('./routes/auth.routes');
 const adminRoutes = require('./routes/admin.routes');
 const painterRoutes = require('./routes/painter.routes');
+const deviceRoutes = require('./routes/device.routes');
 
 const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:19006';
@@ -42,6 +43,7 @@ async function start() {
   app.use('/auth', authRoutes);
   app.use('/admin', adminRoutes);
   app.use('/painters', painterRoutes);
+  app.use('/device', deviceRoutes);
 
   mongoose.connection.on('error', (err) => {
     console.error('MongoDB connection error:', err);
