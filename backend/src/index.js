@@ -38,16 +38,16 @@ async function start() {
     console.error('MongoDB connection error:', err);
   });
 
-  try {
-    await mongoose.connect(MONGO_URI, { autoIndex: true });
-    console.log('MongoDB connected');
-  } catch (err) {
-    console.error('Failed to connect to MongoDB:', err.message);
-  }
-
+  // Start HTTP server immediately so /health works even if Mongo is down
   server.listen(PORT, () => {
-    console.log();
+    console.log(`Server listening on port ${PORT}`);
   });
+
+  // Connect to MongoDB without blocking server start
+  mongoose
+    .connect(MONGO_URI, { autoIndex: true, serverSelectionTimeoutMS: 2000 })
+    .then(() => console.log('MongoDB connected'))
+    .catch((err) => console.error('Failed to connect to MongoDB:', err.message));
 
   process.on('SIGINT', async () => {
     console.log('Shutting down...');
